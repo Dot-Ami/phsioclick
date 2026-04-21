@@ -103,4 +103,4 @@ When appending to `relationship-edges.js`, `remedies.js`, or `movements.js`, inc
 
 ## 9. Git discipline
 
-Working directory is **not** a git repo today. Do not initialize one without explicit user consent. When version control is introduced, commits must pass the build gate first.
+Remote: **https://github.com/Dot-Ami/phsioclick** (default branch `main`). Commits must pass the build gate first (`cd c:\phsioclick\bodymap-app && npx vite build`) before push. Prefer small, focused commits; use PRs to `main` when collaborating.
