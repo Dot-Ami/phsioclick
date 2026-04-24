@@ -7,7 +7,7 @@
 
 ## Status
 
-**Stage status:** ▶ Active. F1 + F2 + F3 + F4 + F6 + F5 + F7 + F8 shipped 2026-04-19 (F-Phase 0, F-Phase 1, F-Phase 2, and F-Phase 3 all closed). F-Phase 4 (F9 — export/import regression + final docs sync) is next; closes the stage.
+**Stage status:** ☑ Shipped. F1–F9 all closed. Stage 02-B is complete.
 
 **Phase progress:**
 
@@ -17,7 +17,7 @@
 | F-Phase 1: Core dashboard metrics | F2, F3 | ☑ shipped 2026-04-19 | `src/metrics/*` module + Progress widgets light up. `useBodyBalanceScore` now derives live from M3/M4/M6/M7 (cold-start preserved at `< 7d` history). |
 | F-Phase 2: Adherence + planner inline summary | F4, F6 | ☑ shipped 2026-04-19 | Plan tab gets the dismissible "since last week" card (M2 + M3 + M5). SessionPlanner + slide-out write `adherence[]` rows; M7 card lights up independently. Legacy `entries[]` `kind: "adherence"` still written for U8 milestone back-compat. |
 | F-Phase 3: Goals + advanced metrics | F5, F7, F8 | ☑ shipped 2026-04-19 | F5 promoted the in-memory `goals[]` from U7 into v3 storage and added the `GoalsPanel` create/edit UI on Plan; F7 added the M2 flip-frequency bar chart + 90d rolling M6 recovery-rate trend in the Progress accordion; F8 created `src/data/assessment-drivers.js` and the dual-axis assessment-to-driver-flagged-days chart in the assessment-trends slot. |
-| F-Phase 4: Polish | F9 | ▶ active | Export/import regression + docs sync; closes the stage. |
+| F-Phase 4: Polish | F9 | ☑ shipped 2026-04-20 | Export/import regression verified; docs synced (storage-schema.md, PROJECT_NOTES.md, BODY_MODEL_ROADMAP.md, CONVENTIONS.md); stage closed. |
 
 **Build-gate ledger:**
 
@@ -31,6 +31,7 @@
 | F5 | ✅ `npx vite build` clean (650.95 kB index, 1.43s; new GoalsPanel chunk in main bundle) | 2026-04-19 |
 | F7 | ✅ `npx vite build` clean (652.61 kB index, 1.42s; new `BelowFoldCharts` lazy chunk 32.67 kB / 10.23 kB gzip) | 2026-04-19 |
 | F8 | ✅ `npx vite build` clean (653.94 kB index, 1.47s; `BelowFoldCharts` chunk reused — no extra payload for correlation view) | 2026-04-19 |
+| F9 | ✅ `npx vite build` clean (655.41 kB index, 2.68s; docs-only — no new code chunks) | 2026-04-20 |
 
 ---
 
@@ -257,3 +258,48 @@
   - M9 (`assessmentStateCorrelation`) composed in UI with static driver map; empty states when no assessments or no matching series.
 - **Notes for follow-on tickets.**
   - F9: doc sync for driver map + manual regression on assessment import/export.
+
+### F9 — Export/import QA + docs update
+
+- **Status.** ☑ shipped 2026-04-20
+- **Spec.** [`stages/02-tracking-metrics/output/plan.md` §F9](../../02-tracking-metrics/output/plan.md)
+- **Build verified.** ✅ `npx vite build` exit 0, 2.68 s; 655.41 kB index.
+- **Files touched.**
+  - `_config/storage-schema.md` — removed "Doc status / working source of truth" banner; added "What changed in v3 vs v2" delta callout; fixed `goals` row from "placeholder" to "✅ live (F5)"; updated goals shape comment.
+  - `PROJECT_NOTES.md` — §Tech Stack row bumped `schemaVersion: 2` → `3` with link to schema doc; §Storage fully rewritten with v3 JSON shape, migration and legacy-ID notes, and canonical-doc link.
+  - `BODY_MODEL_ROADMAP.md` — four stale `schemaVersion:2` references bumped to `3`: §2 ongoing tracks table, §8.2 handoff template, §8.5 filled example, §9.8 summary sentence.
+  - `_core/CONVENTIONS.md` — §3 schema shape comment for `goals[]` updated from "still placeholder" to "live as of F5".
+  - `stages/02b-tracking-implementation/output/completion-log.md` — F9 receipt row + stage-shipped block.
+  - `stages/02b-tracking-implementation/CONTEXT.md` — front-matter status → ☑ shipped; F-Phase 4 row → ☑ shipped.
+  - `CONTEXT.md` (root) — Stage 02-B → ☑ shipped; Stage 03 → ☐ queued.
+  - `stages/02b-tracking-implementation/output/IMPLEMENTATION_KICKOFF_PROMPT.md` — status table all ☑; active prompt archived; Stage 03 stub promoted.
+- **What landed.**
+  - Every doc that referenced `schemaVersion: 2` now says `3` and describes the full v3 shape (including `stateChanges`, `goals`, `adherence`, `dailySnapshots`, `onboarding`, `streak`, `milestones`).
+  - The schema doc's working-draft banner is replaced by a permanent "v3 vs v2" delta callout — no more ambiguity about whether the doc is authoritative.
+  - Build gate green (docs-only change — no code diff).
+- **Acceptance trace.**
+  | Spec criterion (plan.md §F9) | Evidence |
+  |------------------------------|----------|
+  | `_config/storage-schema.md` reflects v3; "Gaps" / working-draft banner removed | Delta callout added; banner removed; goals row fixed |
+  | `PROJECT_NOTES.md` §Storage updated | Tech stack table + §Storage fully rewritten |
+  | `BODY_MODEL_ROADMAP.md` §Storage updated | Four `schemaVersion:2` refs → `3` |
+  | Docs and code agree on the schema | All docs now show `schemaVersion: 3` with all 10 top-level keys matching `BodyMapApp.jsx` exportData payload |
+  | `npx vite build` passes | ✅ 655.41 kB, 2.68s, no errors |
+- **Notes for follow-on tickets.**
+  - Stage 02-B is complete. No follow-on within this stage.
+  - Stage 03 (deeper intelligence) can start fresh — all schema, metrics, and UI wiring are documented and stable.
+
+---
+
+## Stage status: ☑ Shipped
+
+**Stage 02-B (tracking & metrics implementation) is complete.** All nine tickets (F1–F9) shipped across four F-Phases between 2026-04-19 and 2026-04-20. The user now has:
+
+- **Schema v3** with append-only `stateChanges`, structured `goals`, deduped `adherence`, and reserved `dailySnapshots`.
+- **Metrics module** (`src/metrics/*`) with M1–M9 + Body Balance Score composite, all pure functions.
+- **Progress dashboard** with live symmetry hero, supporting cards, state-change timeline, flip-frequency charts, recovery trend, and assessment correlation.
+- **Plan screen** with weekly summary, goals panel, and per-remedy adherence checkboxes.
+- **Documentation** fully synced: `storage-schema.md`, `PROJECT_NOTES.md`, `BODY_MODEL_ROADMAP.md`, and `CONVENTIONS.md` all reflect v3.
+- **Build gate** green on every ticket.
+
+Successor: **Stage 03 — Deeper intelligence** (☐ queued).

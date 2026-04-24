@@ -13,7 +13,7 @@
 | **F-Phase 1: Core dashboard metrics** | F2 (metrics module + live `useBodyBalanceScore`), F3 (Progress widgets light up) | ☑ shipped 2026-04-19 | [`./completion-log.md` §F2 / §F3](./completion-log.md) |
 | **F-Phase 2: Adherence + planner inline summary** | F4 (planner inline "since last week" summary), F6 (adherence checkboxes + `adherence[]` catalog write-through) | ☑ shipped 2026-04-19 | [`./completion-log.md` §F4 / §F6](./completion-log.md) |
 | **F-Phase 3: Goals + advanced metrics** | F5, F7, F8 | ☑ shipped 2026-04-19 | [`./completion-log.md`](./completion-log.md) §F5 / §F7 / §F8 |
-| **F-Phase 4: Polish** | F9 | ▶ active — see "Prompt to paste" below | — |
+| **F-Phase 4: Polish** | F9 | ☑ shipped 2026-04-20 | [`./completion-log.md` §F9](./completion-log.md) |
 
 Stage 02-A.5 (UX foundation implementation) shipped 2026-04-19; all eight U-tickets green; every swap-point this stage fills was reserved there. See [`../../02a5-ux-implementation/output/completion-log.md`](../../02a5-ux-implementation/output/completion-log.md) for the swap-point contracts you'll be wiring into.
 
@@ -21,58 +21,30 @@ Stage 02-B F-Phase 0 through F-Phase 3 shipped 2026-04-19 — schema v3 is live 
 
 ---
 
-## Prompt to paste (next session — F-Phase 4, F9 only)
+## Prompt to paste (next session — Stage 03 kickoff)
+
+**Stage 02-B is complete.** The prompt below is a stub for the next stage. Flesh it out when Stage 03 is ready to begin.
 
 ```
-You are closing Stage 02-B (tracking & metrics implementation). F1
-through F8 have shipped. F9 is the polish + docs sync ticket that
-closes the stage.
+You are starting Stage 03 (deeper intelligence) for the Dot Body Map
+project. Stage 02-B (tracking & metrics implementation) shipped
+2026-04-20 — schema v3 is live, src/metrics/* has M1–M9 + Body Balance
+Score, every Progress / Plan / Today widget is wired, and all docs are
+synced.
 
 Read in order:
   1. c:\phsioclick\CLAUDE.md
   2. c:\phsioclick\CONTEXT.md
-  3. c:\phsioclick\stages\02b-tracking-implementation\CONTEXT.md
-  4. c:\phsioclick\stages\02b-tracking-implementation\output\completion-log.md
-  5. c:\phsioclick\stages\02-tracking-metrics\output\plan.md §4 F9
+  3. c:\phsioclick\stages\03-deeper-intelligence\CONTEXT.md  (to be created)
 
-Ticket this session:
+Stage 03 scope (to be defined by the user):
+  - ML / trend forecasting?
+  - Janda cross-pattern symmetry weighting?
+  - Predictive recovery windows?
+  - Advanced correlation / causation insights?
+  - Daily snapshot rollup automation?
 
-  F9 — Export/import QA + docs update
-       - Manual regression: export v2 blob (if you have one or can
-         synthesize from a pre-v3 fixture) → import into v3 build →
-         every widget populates, no data lost. Confirm U7+U8 fields
-         (onboarding/streak/milestones) survived the bump verbatim.
-       - Manual regression: export v3 blob → re-import → all new
-         fields survive byte-for-byte (modulo unordered map ordering).
-       - _config/storage-schema.md and _core/CONVENTIONS.md §3 already
-         document the live v3 shape (adherence[] live as of F6,
-         goals[] live as of F5, dailySnapshots[] reserved). F9's job is
-         the FINAL canonical pass: add a "What changed in v3 vs v2"
-         delta callout at the top of _config/storage-schema.md, remove
-         the "Doc status" working-source-of-truth banner, and reconcile
-         any drift between the doc and BodyMapApp.jsx's actual load /
-         save / migrate paths.
-       - Update PROJECT_NOTES.md §Storage and BODY_MODEL_ROADMAP.md
-         §Storage — both still point at v2. Bump to v3, link the
-         schema doc, keep the legacy file's narrative voice.
-       - npx vite build passes; no console errors on cold start.
-
-Stage close-out:
-  1. Append the F9 row + a final "Stage status: ☑ shipped" block to
-     output/completion-log.md.
-  2. Update root CONTEXT.md: Stage 02-B → ☑ shipped; Stage 03 (deeper
-     intelligence) → ▶ active OR ☐ queued depending on user direction.
-     Update the "Active stage" pointer accordingly.
-  3. Update this kickoff file: status table all rows ☑ shipped;
-     promote a Stage 03 kickoff prompt (you write it, modeled on this
-     file) to "Prompt to paste"; archive every shipped prompt at the
-     bottom.
-  4. Update stages/02b-tracking-implementation/CONTEXT.md front-matter
-     status to ☑ shipped; every F-Phase row to ☑ shipped.
-
-Then stop and hand control back. The Body Balance Score is fully live;
-every Stage 02-A.5 swap-point is filled; the user has a working
-balance / progress / adherence / goal loop end-to-end.
+Do not begin coding until the user confirms scope and tickets.
 ```
 
 ---
@@ -102,7 +74,23 @@ For agent verification of inputs.
 
 ---
 
-## Archive — shipped prompts
+### F-Phase 4 prompt (F9) — shipped 2026-04-20
+
+```
+You are closing Stage 02-B (tracking & metrics implementation). F1
+through F8 have shipped. F9 is the polish + docs sync ticket that
+closes the stage.
+
+Read in order:
+  1. c:\phsioclick\CLAUDE.md
+  2. c:\phsioclick\CONTEXT.md
+  3. c:\phsioclick\stages\02b-tracking-implementation\CONTEXT.md
+  4. c:\phsioclick\stages\02b-tracking-implementation\output\completion-log.md
+  5. c:\phsioclick\stages\02-tracking-metrics\output\plan.md §4 F9
+
+Ticket: F9 — Export/import QA + docs update. See completion-log.md §F9
+for the full receipt.
+```
 
 ### F-Phase 3 prompt (F5 + F7 + F8) — shipped 2026-04-19
 

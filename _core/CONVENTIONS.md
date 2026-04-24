@@ -33,7 +33,7 @@
     "milestones":  [ /* { id, achievedAt } */ ],
 
     "stateChanges":   [ /* { id, muscleId, fromState, toState, timestamp, source } — append-only flip log; seeded from muscleStates on v2 → v3 migration with source: "migration-seed" */ ],
-    "goals":          [ /* still persisted as a literal [] until Stage 02-B / F5 promotes the in-memory U7 goals[] into storage */ ],
+    "goals":          [ /* live as of Stage 02-B / F5; GoalsPanel CRUD on Plan; M8 wired; normalizeOneGoal + migrateLegacyId on targetMuscleId */ ],
     "adherence":      [ /* { id, date, muscleId, remedyKey, remedyTitle, status, source, timestamp } — live as of Stage 02-B / F6; deduped on (date, muscleId, remedyKey); status ∈ "suggested" | "done" | "skipped"; source ∈ "session-planner" | "slide-out" */ ],
     "dailySnapshots": [ /* reserved for future rollups; not yet written */ ]
   }

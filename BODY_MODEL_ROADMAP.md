@@ -196,7 +196,7 @@ We are not building one monolithic "AI." We are stacking **layers**, each depend
 |-------|---------|--------|
 | Female atlas parity | Same splits as male where feasible | ☐ todo |
 | Atlas backlog (deep rotators, tib post, etc.) | `PROJECT_NOTES.md` Future Backlog | ☐ todo |
-| Storage versioning | `schemaVersion` in localStorage blob + migration | ☑ done (schemaVersion:2) |
+| Storage versioning | `schemaVersion` in localStorage blob + migration | ☑ done (schemaVersion:3; bumped by Stage 02-B / F1 2026-04-19) |
 | L1 edge library growth | ≥30 edges with mechanism + confidence | ☑ done (32/30+) |
 | L3 remedy library growth | More muscles, more states, video links | ☑ done (35 remedies, ~25 muscles) |
 | L4 movement catalog growth | More lifts (overhead, row, lunge, pull-up) | ☑ done (10 lifts) |
@@ -379,7 +379,7 @@ Current focus: [e.g. grow L1 edge library / add overhead press to L4 / improve P
 
 Non-goals for this thread: [e.g. no ML / no backend / no skeletal animation].
 
-Constraints: preserve Log/Dashboard/Assessments/Planner; backward-compatible muscle IDs (migrateLegacyId); schemaVersion:2 in localStorage; all data modules use SUB_MUSCLES base IDs as join keys.
+Constraints: preserve Log/Dashboard/Assessments/Planner; backward-compatible muscle IDs (migrateLegacyId); schemaVersion:3 in localStorage (bumped by Stage 02-B / F1); all data modules use SUB_MUSCLES base IDs as join keys.
 
 What I want from you: [your ask].
 ```
@@ -410,7 +410,7 @@ Roadmap method: Layered body model L0–L5, all live in v1. See §1–§2 for la
 
 Standing non-goals: no ML for core logic v1; no backend/multi-user sync until local model is solid; no skeletal rig or full pose animation until phase-tint recruitment validates for 5+ lifts.
 
-Constraints: preserve Log/Dashboard/Assessments/Planner; backward-compatible muscle IDs + migrateLegacyId; schemaVersion:2; all new data MUST use SUB_MUSCLES base IDs as join keys.
+Constraints: preserve Log/Dashboard/Assessments/Planner; backward-compatible muscle IDs + migrateLegacyId; schemaVersion:3; all new data MUST use SUB_MUSCLES base IDs as join keys.
 
 Decisions already made: §9 (JSON rules, repo remedies, phase tinting, extended localStorage, rules-based planner, male-first granularity).
 
@@ -474,4 +474,4 @@ These are **working defaults** for Dot Body Map so assistants do not re-litigate
 
 ### 9.8 Summary sentence for any assistant
 
-**Store mechanics and relationships as versioned JSON keyed to existing muscle IDs; extend localStorage (schemaVersion:2); visualize movements as phased recruitment tinting on the current SVG; explain holistic links with mechanism + confidence grounded in L0; use rules/templates for planner v1; disclaim diagnostic scope; ship male-first with honest UI labels until female splits land.**
+**Store mechanics and relationships as versioned JSON keyed to existing muscle IDs; extend localStorage (schemaVersion:3, bumped by Stage 02-B); visualize movements as phased recruitment tinting on the current SVG; explain holistic links with mechanism + confidence grounded in L0; use rules/templates for planner v1; disclaim diagnostic scope; ship male-first with honest UI labels until female splits land.**

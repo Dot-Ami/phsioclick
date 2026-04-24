@@ -1,9 +1,9 @@
 # Storage schema
 
 **Key:** `dot-body-map-v3`
-**Current schema version:** `3` (bumped 2026-04-19 by Stage 02-B / F1).
+**Current schema version:** `3` (bumped 2026-04-19 by Stage 02-B / F1; final doc pass by F9 2026-04-20).
 
-> **Doc status.** This file documents the live v3 shape. Stage 02-B / F9 owns the final canonical pass (regression QA + a "what changed in v3" delta callout). Until then, treat this file as the working source of truth — it tracks the codebase, not the original v2 spec.
+> **What changed in v3 vs v2.** Schema v2 stored `entries`, `assessments`, and `muscleStates`. v3 (Stage 02-B / F1, 2026-04-19) adds four new top-level arrays — `stateChanges` (append-only flip log, F1), `goals` (structured targets, F5), `adherence` (remedy checkboxes, F6), and `dailySnapshots` (reserved) — plus the three U7+U8 additive objects that are now native to v3: `onboarding`, `streak`, `milestones`. Migration is handled by `migrateBlobToV3()` in `BodyMapApp.jsx`, which is idempotent on v3 blobs and seeds `stateChanges` from `muscleStates` on v2 blobs.
 
 ---
 
@@ -75,11 +75,12 @@
   ],
 
   "goals": [
-    // Persisted as a literal [] until Stage 02-B / F5 promotes the in-memory
-    // U7 goals[] React state into v3 storage. Goal row shape (per plan.md §3.3):
+    // Live as of Stage 02-B / F5. GoalsPanel CRUD on Plan; read-only on Progress.
+    // Goal row shape (per plan.md §3.3):
     // { id, kind: "reduce-flagged-days" | "improve-symmetry" | "hit-adherence" | "freeform",
     //   targetMuscleId?, baseline?, target, status: "active" | "complete" | "abandoned",
     //   createdAt, completedAt? }
+    // normalizeOneGoal() + migrateLegacyId() applied on every write + import.
   ],
 
   "adherence": [
@@ -144,7 +145,7 @@ When bumping `schemaVersion`:
 | Field | Status | Owner | Purpose |
 |-------|--------|-------|---------|
 | `stateChanges` | ✅ live (F1) | F1 | Append-only flip log; powers M1 / M2 / M3 / M5 / M6 in `src/metrics/*` |
-| `goals` | 📦 placeholder `[]` (F1) | F5 (active in F-Phase 3) | Will hold structured user goals (`reduce-flagged-days`, `improve-symmetry`, `hit-adherence`, `freeform`) once F5 promotes the in-memory U7 React state |
+| `goals` | ✅ live (F5) | F5 | Structured user goals (`reduce-flagged-days`, `improve-symmetry`, `hit-adherence`, `freeform`); GoalsPanel CRUD on Plan, read-only on Progress; `normalizeOneGoal` + `migrateLegacyId` on `targetMuscleId`; M8 wired |
 | `adherence` | ✅ live (F6) | F6 | Suggested + Done + Skipped remedy rows; powers M7 + the BBS adherence component. Single writer is `BodyMapApp.handleAdherenceChange`; deduped on `(date, muscleId, remedyKey)` |
 | `dailySnapshots` | 📦 placeholder `[]` (F1) | future | Reserved; no current writer |
 | `onboarding`, `streak`, `milestones` | ✅ native to v3 (folded from U7+U8) | — | First-run wizard / tour state, daily-action streak, milestone catalog |

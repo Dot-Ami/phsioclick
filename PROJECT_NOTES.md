@@ -40,7 +40,7 @@ The granular atlas is **foundation data**. On top of it, the direction is:
 | Atlas (male) | Patched fork: `BodyAtlas.jsx` + `atlas-assets/bodyFront.js` / `bodyBack.js` |
 | Atlas (female) | Stock `bodyFemaleFront` / `bodyFemaleBack` (no path splits yet) |
 | Charts | Recharts (lazy loaded via `TrendCharts.jsx`) |
-| Storage | localStorage JSON blob (`schemaVersion: 2`) |
+| Storage | localStorage JSON blob (`schemaVersion: 3`); see [`_config/storage-schema.md`](./_config/storage-schema.md) |
 | Language | JavaScript (JSX) |
 
 **App root:** `c:\phsioclick\bodymap-app`
@@ -153,20 +153,27 @@ Some subs have no dedicated path. They map to the closest visible region (e.g. g
 
 ## Storage
 
-**Key:** `dot-body-map-v3` | **Current schema version:** `2`
+**Key:** `dot-body-map-v3` | **Current schema version:** `3` (bumped 2026-04-19 by Stage 02-B / F1)
+
+Full shape reference: [`_config/storage-schema.md`](./_config/storage-schema.md).
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "entries": [ ... ],
   "assessments": [ ... ],
-  "muscleStates": {
-    "glute-max-l": { "state": "weak", "updatedAt": "2026-04-14T..." }
-  }
+  "muscleStates": { "glute-max-l": { "state": "weak", "updatedAt": "ISO-8601" } },
+  "onboarding": { "completedAt": null, "intent": null, "tourSeen": { ... } },
+  "streak":     { "current": 0, "longest": 0, "lastActiveDate": null },
+  "milestones":  [ { "id": "first-flip", "achievedAt": "ISO-8601" } ],
+  "stateChanges": [ { "id": "sc-…", "muscleId": "…", "fromState": "…", "toState": "…", "timestamp": "…", "source": "…" } ],
+  "goals":        [ { "id": "…", "kind": "reduce-flagged-days", "targetMuscleId": "…", ... } ],
+  "adherence":    [ { "id": "adh-…", "date": "YYYY-MM-DD", "muscleId": "…", "remedyKey": "…", "status": "suggested|done|skipped", ... } ],
+  "dailySnapshots": []
 }
 ```
 
-`migrateLegacyId()` handles backward compat. Export / import both include `muscleStates` and `schemaVersion`.
+`migrateBlobToV3()` in `BodyMapApp.jsx` handles v1/v2 → v3 migration (idempotent on v3). `migrateLegacyId()` normalizes pre-v3 muscle IDs. Export / import round-trip all top-level keys including the v3 additions.
 
 ---
 

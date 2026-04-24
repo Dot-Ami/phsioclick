@@ -1,6 +1,6 @@
 # Stage 02-B — Tracking & metrics implementation
 
-> **Status:** ▶ Active (scaffolded 2026-04-19; F-Phase 0 + F-Phase 1 + F-Phase 2 + F-Phase 3 ☑ shipped — through F8; F-Phase 4 / F9 is next to close the stage).
+> **Status:** ☑ Shipped (scaffolded 2026-04-19; F1–F8 shipped 2026-04-19; F9 shipped 2026-04-20; stage closed).
 > **Predecessor (planning):** Stage 02 (tracking & metrics) — specs live in [`../02-tracking-metrics/output/plan.md`](../02-tracking-metrics/output/plan.md) and [`../02-tracking-metrics/output/decisions.md`](../02-tracking-metrics/output/decisions.md).
 > **Predecessor (UX shell):** Stage 02-A.5 (UX foundation implementation) — receipts in [`../02a5-ux-implementation/output/completion-log.md`](../02a5-ux-implementation/output/completion-log.md). Every swap-point this stage fills was reserved there.
 > **Successor:** Stage 03 (deeper intelligence) once F-Phase 4 closes.
@@ -65,7 +65,7 @@ This stage runs the nine tickets F1–F9 from `../02-tracking-metrics/output/pla
 | **F-Phase 1: Core dashboard metrics** | F2, F3 | ☑ shipped 2026-04-19 | `src/metrics/` module live (M1-M9 + helpers + bodyBalanceScore + index barrel); Progress hero shows live composite symmetry trend with 7/30/90-day window selector + sparkline; supporting row shows live M4 + M6 (M7 cold-start until F6); hot regions slot (M5) lit; state-change timeline slot lit; `useBodyBalanceScore` returns a live composite as soon as ≥ 7 days of `stateChanges` exist (otherwise neutral 50 + `isCalibrating: true`); calibration banner explains the wait. |
 | **F-Phase 2: Adherence + planner inline summary** | F4, F6 | ☑ shipped 2026-04-19 | Plan screen shows "since last week" micro-summary (M2 + M3 + M5, dismissible, calibrates < 7d); remedy rows in SessionPlanner + slide-out have Done / Skip toggles that write to `adherence[]` (deduped on date+muscleId+remedyKey); adherence rate card on Progress lights up independently as soon as `suggested > 0`; legacy `kind: "adherence"` entries still fire so U8 milestone keeps working |
 | **F-Phase 3: Goals + advanced metrics** | F5, F7, F8 | ☑ shipped 2026-04-19 | `goals[]` live in v3 with GoalsPanel + GoalCard + read-only Progress summary; M2 flip-frequency chart + M6 recovery trend (`BelowFoldCharts`); M9 + `assessment-drivers.js` dual-axis correlation in assessment-trends slot |
-| **F-Phase 4: Polish** | F9 | ▶ active | Manual export/import regression in both directions; `_config/storage-schema.md` reflects v3; legacy `PROJECT_NOTES.md` §Storage updated; `output/completion-log.md` finalized; stage closes |
+| **F-Phase 4: Polish** | F9 | ☑ shipped 2026-04-20 | Manual export/import regression in both directions; `_config/storage-schema.md` reflects v3; legacy `PROJECT_NOTES.md` §Storage + `BODY_MODEL_ROADMAP.md` §Storage updated; `output/completion-log.md` finalized; stage closed |
 
 After each ticket: append a row to `output/completion-log.md` mirroring the U1–U8 receipt format (Status, Spec, Build verified, Files touched, What landed, Acceptance trace, Notes for follow-on tickets).
 

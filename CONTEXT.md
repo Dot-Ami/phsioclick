@@ -16,17 +16,13 @@ Full layer reference: [`shared/body-model.md`](./shared/body-model.md)
 
 ## Active stage
 
-**➡ `stages/02b-tracking-implementation/`** — Stage 02-B (tracking & metrics implementation). Scaffolded 2026-04-19 as a dedicated execution stage that mirrors the 02-A → 02-A.5 split. It consumes [`stages/02-tracking-metrics/output/plan.md`](./stages/02-tracking-metrics/output/plan.md) (read-only) and writes its receipts into `stages/02b-tracking-implementation/output/completion-log.md`.
+**Stage 02-B is complete (☑ shipped 2026-04-20).** All nine F-tickets closed across four F-Phases. Schema v3 is live, metrics module exists, Progress + Plan + Today are fully wired, docs synced.
 
-The work is **filling the swap-points Stage 02-A.5 reserved**, not rebuilding screens. F-Phase 0 + F-Phase 1 + F-Phase 2 + F-Phase 3 have shipped (F1–F8 — see receipts). **F-Phase 4 (F9)** is next: export/import regression plus final docs sync (`storage-schema.md`, `PROJECT_NOTES.md` §Storage).
+**No implementation stage is currently active.** Stage 03 (deeper intelligence) is ☐ queued. To begin Stage 03, create `stages/03-deeper-intelligence/CONTEXT.md` and a kickoff prompt, then update this file's Active stage pointer.
 
-The next chat should open [`stages/02b-tracking-implementation/output/IMPLEMENTATION_KICKOFF_PROMPT.md`](./stages/02b-tracking-implementation/output/IMPLEMENTATION_KICKOFF_PROMPT.md) and paste the active **F-Phase 4 / F9** prompt block into a fresh session.
-
-Read that stage's `CONTEXT.md` next.
-
-**Progress (2026-04-19):**
+**Progress (2026-04-20):**
 - Stage 02-A.5 ☑ closed. All seven U-tickets shipped — U-Phase 0 (U1 tokens, U2 nav shell), U-Phase 1 (U3 Today + Body Balance Score cold-start, U4 Body screen + muscle slide-out + Learn layer, U5 Plan screen + shared `lib/session-plan.js`), U-Phase 2 (U6 Progress shell with symmetry-trend hero + M4/M6/M7 supporting row + default-collapsed accordion of Stage 02-B slot contracts and the re-homed legacy Dashboard), U-Phase 3 (U7 six-step onboarding wizard + per-tab tour overlays + Settings drawer; U8 gamification). See `stages/02a5-ux-implementation/output/completion-log.md` for full receipts.
-- Stage 02-B ▶ active. Through F-Phase 3: same F1–F6 foundation as before, plus F5 v3 `goals[]` + GoalsPanel / GoalCard / read-only Progress goals strip (M8), F7 flip-frequency + 90d recovery trend charts (`BelowFoldCharts`), F8 `assessment-drivers.js` + dual-axis assessment–driver correlation (M9). Next: **F-Phase 4 (F9)** — export/import QA + docs sync; closes the stage. See `stages/02b-tracking-implementation/output/completion-log.md`.
+- Stage 02-B ☑ shipped 2026-04-20. All nine F-tickets (F1–F9) closed. Schema v3 live; `src/metrics/*` has M1–M9 + Body Balance Score; Progress hero + supporting cards + accordion slots live (including F7 flip charts and F8 assessment correlation); Plan has F4 weekly summary + F5 GoalsPanel + F6 adherence checkboxes; docs fully synced. See `stages/02b-tracking-implementation/output/completion-log.md`.
 
 ---
 
@@ -39,7 +35,7 @@ Read that stage's `CONTEXT.md` next.
 | 02 | Tracking & metrics (Track F) — planning | ☑ planning shipped | `stages/02-tracking-metrics/` |
 | 02-A | UX foundation — onboarding, IA reshuffle, design tokens, Learn layer, medium gamification | ☑ planning shipped | `stages/02a-ux-foundation/` |
 | 02-A.5 | UX foundation implementation — execute U1–U8 tickets against the codebase | ☑ shipped 2026-04-19 | `stages/02a5-ux-implementation/` |
-| 02-B | Tracking & metrics implementation — F1–F9: schema v3 + metrics module + Progress widgets + adherence + goals + advanced charts | ▶ active (scaffolded 2026-04-19) | `stages/02b-tracking-implementation/` (consumes `stages/02-tracking-metrics/output/plan.md`) |
+| 02-B | Tracking & metrics implementation — F1–F9: schema v3 + metrics module + Progress widgets + adherence + goals + advanced charts + docs sync | ☑ shipped 2026-04-20 | `stages/02b-tracking-implementation/` (consumes `stages/02-tracking-metrics/output/plan.md`) |
 | 03 | Deeper intelligence (Track E) | ☐ queued | `stages/03-deeper-intelligence/` |
 | 04 | Content expansion — female atlas parity, new muscles (Track G) | ☐ queued | `stages/04-content-expansion/` |
 
