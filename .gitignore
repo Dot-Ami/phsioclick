@@ -4,6 +4,9 @@ node_modules/
 dist/
 **/dist/
 dist-ssr/
+# Vendored package ships prebuilt output — must stay in git or the app
+# cannot build from a fresh clone (BodyAtlas imports its dist/esm files).
+!bodymap-app/vendor/react-muscle-highlighter/dist/
 *.local
 
 # Logs

@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# Keep the vendored package's prebuilt output — required to build.
+!vendor/react-muscle-highlighter/dist/
 *.local
 
 # Editor directories and files
