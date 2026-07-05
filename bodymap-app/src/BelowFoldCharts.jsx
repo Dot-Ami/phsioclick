@@ -24,7 +24,7 @@
 // color constants below mirror the values in `tailwind.config.js`
 // (theme.colors.brand + theme.colors.state.*). Update both files together.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -314,12 +314,10 @@ function AssessmentCorrelationChart({
   }, [correlation]);
 
   const [test, setTest] = useState(tests[0] || "");
+  // Derived fallback: if the previously selected test key no longer exists
+  // in `tests` (e.g. underlying data changed), fall back to the first test
+  // on every render — no need to sync this back into `test` via an effect.
   const activeTest = test && tests.includes(test) ? test : tests[0];
-
-  useEffect(() => {
-    if (!tests.length) return;
-    if (!tests.includes(test)) setTest(tests[0]);
-  }, [tests, test]);
 
   const driverIds = activeTest && drivers ? drivers[activeTest] || [] : [];
   const driverLabels = driverIds

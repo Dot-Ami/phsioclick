@@ -1,16 +1,14 @@
 // Stage 02-A.5 / U2 + U3 — TodayScreen.
 // Job: "What should I do right now?"
 // Layout per stages/02a-ux-foundation/output/screens.md "Today screen":
-//   - Hero: BodyBalanceScore (cold-start path: 50 + "Calibrating")
+//   - Hero: BodyBalanceScore (real components once `stateChanges` spans 7+
+//     days; the hook's own cold-start contract still renders "Calibrating"
+//     for brand-new users)
 //   - Card: Today's Session (derived from muscleStates as a stand-in for
 //     SessionPlanner's session logic until U-Phase 1 wires it deeper)
-//   - Card: Hot Regions (deterministic stand-in for Stage 02 M5)
+//   - Card: Hot Regions (real M5 `hotRegions()` from src/metrics)
 //   - Below the fold: Recent activity
 //   - Empty state when there's no activity to surface
-//
-// Stage 02 metric values aren't implemented yet, so cold-start renders the
-// "Calibrating" hero. TODO(stage-02-b): swap deterministic stand-ins for the
-// real M3/M4/M5/M6/M7 outputs from stages/02-tracking-metrics/output/plan.md §2.
 
 import { useMemo } from "react";
 import {
@@ -22,9 +20,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import BodyBalanceScore from "./BodyBalanceScore";
-import { fromMuscleId, getMuscleLabel } from "./muscle-data";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { hotRegions } from "./metrics/hotRegions";
+import { getMuscleLabel } from "./muscle-data";
 
 function formatToday() {
   return new Date().toLocaleDateString(undefined, {
@@ -44,51 +41,6 @@ function timeAgo(timestamp) {
   const days = Math.floor(hours / 24);
   if (days === 1) return "yesterday";
   return `${days}d ago`;
-}
-
-function buildHotRegions(entries, muscleStates) {
-  // Hot Regions stand-in: count consecutive days a flagged muscle was active in
-  // the last 14 days. Real M5 (`stages/02-tracking-metrics/output/plan.md` §2)
-  // will replace this in Stage 02-B.
-  const cutoff = Date.now() - 14 * DAY_MS;
-
-  const flagDays = new Map();
-  for (const entry of entries) {
-    const ts = new Date(entry.timestamp).getTime();
-    if (Number.isNaN(ts) || ts < cutoff) continue;
-    const region = entry.sensationRegion || entry.originRegion;
-    if (!region) continue;
-    const dayKey = new Date(entry.timestamp).toISOString().slice(0, 10);
-    if (!flagDays.has(region)) flagDays.set(region, new Set());
-    flagDays.get(region).add(dayKey);
-  }
-
-  const fromStates = Object.entries(muscleStates)
-    .filter(([, value]) => value?.state && value.state !== "normal")
-    .map(([id, value]) => {
-      const days = flagDays.get(id)?.size ?? 0;
-      const updatedAt = value.updatedAt ? new Date(value.updatedAt).getTime() : 0;
-      return {
-        id,
-        state: value.state,
-        days: Math.max(days, 1),
-        updatedAt,
-      };
-    });
-
-  const seen = new Set(fromStates.map((row) => row.id));
-  const fromEntries = [...flagDays.entries()]
-    .filter(([id]) => !seen.has(id))
-    .map(([id, set]) => ({
-      id,
-      state: "tight",
-      days: set.size,
-      updatedAt: 0,
-    }));
-
-  return [...fromStates, ...fromEntries]
-    .sort((a, b) => b.days - a.days || b.updatedAt - a.updatedAt)
-    .slice(0, 5);
 }
 
 function summarizeSession(muscleStates) {
@@ -118,13 +70,16 @@ function summarizeSession(muscleStates) {
 export default function TodayScreen({
   entries,
   muscleStates,
+  stateChanges,
+  bbs,
+  bbsTrend,
   onOpenBody,
   onOpenPlan,
   onOpenProgress,
 }) {
-  const hotRegions = useMemo(
-    () => buildHotRegions(entries, muscleStates),
-    [entries, muscleStates],
+  const hotRegionsList = useMemo(
+    () => hotRegions({ stateChanges: stateChanges ?? [], now: new Date(), windowDays: 7 }),
+    [stateChanges],
   );
   const session = useMemo(() => summarizeSession(muscleStates), [muscleStates]);
 
@@ -151,7 +106,10 @@ export default function TodayScreen({
 
       {hasAnyData ? (
         <>
-          <BodyBalanceScore components={null} trend={null} />
+          <BodyBalanceScore
+            components={bbs?.isCalibrating ? null : bbs?.components ?? null}
+            trend={bbsTrend ?? null}
+          />
 
           <article
             aria-label="Today's session"
@@ -233,26 +191,20 @@ export default function TodayScreen({
                 View all on Body <ArrowRight size={14} aria-hidden="true" />
               </button>
             </div>
-            {hotRegions.length === 0 ? (
+            {hotRegionsList.length === 0 ? (
               <p className="mt-3 text-body text-zinc-400">
-                Nothing flagged in the last two weeks.
+                Nothing flagged in the last week.
               </p>
             ) : (
               <ul className="mt-3 space-y-1.5">
-                {hotRegions.map((region) => {
-                  const label = getMuscleLabel(region.id) || region.id;
-                  const sideLabel = fromMuscleId(region.id)?.side
-                    ? null
-                    : null;
+                {hotRegionsList.map((region) => {
                   const stateClass =
-                    region.state === "weak"
+                    region.dominantState === "weak"
                       ? "text-state-weak"
-                      : region.state === "tight"
-                      ? "text-state-tight"
-                      : "text-zinc-400";
+                      : "text-state-tight";
                   return (
                     <li
-                      key={region.id}
+                      key={region.baseId}
                       className="flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-950/40 px-3 py-2"
                     >
                       <button
@@ -260,12 +212,10 @@ export default function TodayScreen({
                         onClick={onOpenBody}
                         className="flex w-full items-center justify-between gap-3 text-left"
                       >
-                        <span className="text-body text-zinc-200">
-                          {label}
-                          {sideLabel}
-                        </span>
+                        <span className="text-body text-zinc-200">{region.label}</span>
                         <span className={`text-caption tabular-nums ${stateClass}`}>
-                          {region.days} {region.state} day{region.days === 1 ? "" : "s"}
+                          {region.flaggedDays} {region.dominantState} day
+                          {region.flaggedDays === 1 ? "" : "s"}
                         </span>
                       </button>
                     </li>

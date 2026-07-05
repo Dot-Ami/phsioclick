@@ -17,7 +17,7 @@
 //   bilateral mirrored log (3 days each side):
 //     -> delta 0, composite 0 (perfect symmetry)
 
-import { addDays, asDate, daysInWindow, dayStart } from "./helpers.js";
+import { addDays, dayStart } from "./helpers.js";
 import { stateDaysFlaggedAll } from "./stateHistory.js";
 
 function compositeFromByBaseId(byBaseId) {

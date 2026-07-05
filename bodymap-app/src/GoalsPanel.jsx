@@ -34,7 +34,6 @@ import {
   MUSCLES,
   SUB_MUSCLES,
   getMuscleLabel,
-  fromMuscleId,
   migrateLegacyId,
 } from "./muscle-data";
 
@@ -548,37 +547,35 @@ export default function GoalsPanel({
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
-  const now = useMemo(() => new Date(), [stateChanges, adherence, goals.length]);
+  // Captured once per render (not memoized — it's just a Date construction,
+  // and every metric below should see the same wall clock within a render).
+  const now = new Date();
   const muscleOptions = useMuscleOptions();
 
-  // Surface the most-imbalanced base IDs as a hint inside the symmetry editor.
-  const imbalanceOptions = useMemo(() => {
-    const flagged = stateDaysFlaggedAll({ stateChanges, now, windowDays: 30 });
-    return Object.values(flagged.byBaseId)
-      .map((b) => ({
-        baseId: b.baseId,
-        delta: Math.abs((b.flaggedDays_l || 0) - (b.flaggedDays_r || 0)),
-      }))
-      .filter((b) => b.delta > 0)
-      .sort((a, b) => b.delta - a.delta);
-  }, [stateChanges, now]);
+  // `now` is a fresh Date every render, so a useMemo keyed on it would never
+  // hit its cache — compute these directly instead of paying for the wrapper.
+  const flagged = stateDaysFlaggedAll({ stateChanges, now, windowDays: 30 });
+  const imbalanceOptions = Object.values(flagged.byBaseId)
+    .map((b) => ({
+      baseId: b.baseId,
+      delta: Math.abs((b.flaggedDays_l || 0) - (b.flaggedDays_r || 0)),
+    }))
+    .filter((b) => b.delta > 0)
+    .sort((a, b) => b.delta - a.delta);
 
   const activeGoals = useMemo(
     () => goals.filter((g) => g.status !== "archived"),
     [goals],
   );
 
-  const progressById = useMemo(() => {
-    const rows = goalProgress({
-      goals: activeGoals,
-      stateChanges,
-      adherence,
-      now,
-    });
-    const map = {};
-    for (const r of rows) map[r.goalId] = r;
-    return map;
-  }, [activeGoals, stateChanges, adherence, now]);
+  const progressById = {};
+  const progressRows = goalProgress({
+    goals: activeGoals,
+    stateChanges,
+    adherence,
+    now,
+  });
+  for (const r of progressRows) progressById[r.goalId] = r;
 
   const handleSubmit = (goal) => {
     if (editing && editing.id) {

@@ -29,11 +29,12 @@ function flaggedFor(drivers, testKey, side, { stateChanges, now, windowDays }) {
   return total;
 }
 
+// Note: callers may pass `now`, but each row's own timestamp (`at`) is the
+// correct "as of" clock for that assessment — the outer `now` isn't used.
 export function assessmentStateCorrelation({
   assessments,
   stateChanges,
   drivers,
-  now,
   windowDays = 30,
 }) {
   if (!Array.isArray(assessments) || assessments.length === 0) return [];

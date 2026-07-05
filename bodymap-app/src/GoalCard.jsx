@@ -82,20 +82,23 @@ export default function GoalCard({ muscleStates, goals = [], stateChanges = [], 
 
   const visible = goals.length > 0 ? goals.filter((g) => g.status !== "archived") : starter ? [starter] : [];
 
-  const now = useMemo(() => new Date(), [goals, stateChanges, adherence]);
+  // Captured once per render (not memoized — it's just a Date construction,
+  // and every metric below should see the same wall clock within a render).
+  const now = new Date();
 
-  const progressById = useMemo(() => {
-    if (!goals.length) return {};
+  // `now` is a fresh Date every render, so memoizing this on [goals,
+  // stateChanges, adherence, now] would never actually skip work — compute
+  // it directly instead of paying for a useMemo that can't hit its cache.
+  const progressById = {};
+  if (goals.length) {
     const rows = goalProgress({
       goals: goals.filter((g) => g.status !== "archived"),
       stateChanges,
       adherence,
       now,
     });
-    const map = {};
-    for (const r of rows) map[r.goalId] = r;
-    return map;
-  }, [goals, stateChanges, adherence, now]);
+    for (const r of rows) progressById[r.goalId] = r;
+  }
 
   return (
     <article

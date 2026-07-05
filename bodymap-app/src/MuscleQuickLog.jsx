@@ -6,7 +6,7 @@
 // form remains available on the legacy Today / Body screens until U-Phase 1
 // retires it.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Save } from "lucide-react";
 import { getMuscleLabel } from "./muscle-data";
 
@@ -33,11 +33,9 @@ const EMPTY = {
 };
 
 export default function MuscleQuickLog({ muscleId, onSave }) {
+  // Callers render this with `key={muscleId}` so a muscle change remounts
+  // the component (fresh `form` state) instead of needing a reset effect.
   const [form, setForm] = useState(EMPTY);
-
-  useEffect(() => {
-    setForm(EMPTY);
-  }, [muscleId]);
 
   const label = useMemo(
     () => (muscleId ? getMuscleLabel(muscleId) : ""),

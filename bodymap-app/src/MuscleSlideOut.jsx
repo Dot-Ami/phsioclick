@@ -38,7 +38,7 @@ import RelationshipEdgesPanel from "./RelationshipEdgesPanel";
 import RemedyPanel from "./RemedyPanel";
 import MovementRecruitmentPanel from "./MovementRecruitmentPanel";
 import MuscleQuickLog from "./MuscleQuickLog";
-import { fromMuscleId, getMuscle, getMuscleLabel, toMuscleId } from "./muscle-data";
+import { fromMuscleId, getMuscle } from "./muscle-data";
 import { getMuscleMechanics } from "./data/muscle-mechanics";
 import { getEdgesForMuscle } from "./data/relationship-edges";
 import { getAllRemediesForMuscle } from "./data/remedies";
@@ -364,7 +364,6 @@ export default function MuscleSlideOut({
   const parsed = muscleId ? fromMuscleId(muscleId) : null;
   const baseId = parsed?.slug || null;
   const muscle = muscleId ? getMuscle(muscleId) : null;
-  const sideKey = parsed?.side === "left" ? "l" : parsed?.side === "right" ? "r" : null;
 
   const niceLabel = (muscle?.label || baseId || "Muscle").replace(/ \(.\)$/, "");
 
@@ -570,7 +569,10 @@ export default function MuscleSlideOut({
           )}
 
           {tab === "log" && (
-            <MuscleQuickLog muscleId={muscleId} onSave={onSaveLog} />
+            // key={muscleId} remounts the form (resetting its local state)
+            // when the selected muscle changes, instead of syncing it via
+            // a setState-in-effect.
+            <MuscleQuickLog key={muscleId} muscleId={muscleId} onSave={onSaveLog} />
           )}
         </div>
       </section>

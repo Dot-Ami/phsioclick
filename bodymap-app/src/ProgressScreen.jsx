@@ -512,7 +512,6 @@ export default function ProgressScreen({
   symmetrySummary = null,
   weightedHeatScores = {},
   filteredEntries = [],
-  timelineData = [],
   assessmentTrendData = [],
   filter,
   onFilterChange,
@@ -540,9 +539,11 @@ export default function ProgressScreen({
   // Stage 02-B / F3 — live metrics. `now` is captured once per render so
   // every metric in this section sees the same wall clock and the trend
   // sparkline aligns with the headline composite.
-  const now = useMemo(() => new Date(), [stateChanges, windowDays]);
+  const now = new Date();
 
-  const symmetry = useMemo(() => {
+  // `now` is a fresh Date every render, so these can never hit a useMemo
+  // cache anyway — compute them directly rather than paying for the wrapper.
+  const symmetry = (() => {
     const current = symmetryIndex({ stateChanges, now, windowDays, trendDays: windowDays });
     const previousNow = new Date(now.getTime() - windowDays * DAY_MS);
     const previous = symmetryIndex({
@@ -556,27 +557,15 @@ export default function ProgressScreen({
       delta: current.composite - previous.composite,
       trend: current.trend,
     };
-  }, [stateChanges, now, windowDays]);
+  })();
 
-  const tightness = useMemo(
-    () => tightnessWeaknessLoad({ stateChanges, now, windowDays }),
-    [stateChanges, now, windowDays],
-  );
+  const tightness = tightnessWeaknessLoad({ stateChanges, now, windowDays });
 
-  const recovery = useMemo(
-    () => computeRecoveryRate({ stateChanges, now, windowDays }),
-    [stateChanges, now, windowDays],
-  );
+  const recovery = computeRecoveryRate({ stateChanges, now, windowDays });
 
-  const adherenceMetric = useMemo(
-    () => computeAdherenceRate({ adherence, now, windowDays: 7 }),
-    [adherence, now],
-  );
+  const adherenceMetric = computeAdherenceRate({ adherence, now, windowDays: 7 });
 
-  const hotRegionsList = useMemo(
-    () => computeHotRegions({ stateChanges, now, windowDays: 7, topN: 5 }),
-    [stateChanges, now],
-  );
+  const hotRegionsList = computeHotRegions({ stateChanges, now, windowDays: 7, topN: 5 });
 
   // Stage 02-B / F3 — calibration banner. Empty-state copy when the
   // user has fewer than 7 days of genuine stateChanges history. We do

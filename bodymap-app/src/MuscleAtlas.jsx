@@ -79,7 +79,7 @@ export default function MuscleAtlas({
     }
 
     return parts;
-  }, [origin, sensation, heatScores, showHeat, view, recruitmentTint, stateColors]);
+  }, [origin, sensation, heatScores, showHeat, recruitmentTint, stateColors]);
 
   const [hoveredLabel, setHoveredLabel] = useState('');
 

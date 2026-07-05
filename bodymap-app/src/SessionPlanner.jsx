@@ -402,10 +402,15 @@ export default function SessionPlanner({
 
   // Stage 02-A.5 / U5: external trigger to open the intake wizard from the
   // Calibrate section. Each click bumps `intakeTrigger`; we open the wizard
-  // when the value changes (skip the initial 0).
-  useEffect(() => {
+  // when the value changes (skip the initial 0). Adjusted during render
+  // (React's documented pattern for "state that depends on a prop change")
+  // instead of a setState-in-effect, so opening the wizard isn't delayed by
+  // an extra render pass.
+  const [prevIntakeTrigger, setPrevIntakeTrigger] = useState(intakeTrigger);
+  if (intakeTrigger !== prevIntakeTrigger) {
+    setPrevIntakeTrigger(intakeTrigger);
     if (intakeTrigger > 0) setShowWizard(true);
-  }, [intakeTrigger]);
+  }
 
   const markedMuscles = useMemo(
     () =>

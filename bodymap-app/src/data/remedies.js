@@ -8,6 +8,8 @@
  * - Bump REMEDIES_SCHEMA_VERSION when removing or renaming keys.
  */
 
+import { SUB_MUSCLES } from "../muscle-data.js";
+
 export const REMEDIES_SCHEMA_VERSION = 1;
 
 /**
@@ -568,19 +570,53 @@ export const REMEDIES = [
 ];
 
 /**
+ * Phase 1 / P1-c — parent-group fallback.
+ *
+ * Atlas taps and the intake wizard mostly flag *parent* IDs (e.g.
+ * "hamstring", "gluteal" — the SUB_MUSCLES group key), but REMEDIES are
+ * keyed by *sub-muscle* base IDs (e.g. "biceps-femoris", "glute-max").
+ * When `muscleBaseId` is a parent group with no direct matches, union
+ * remedies across all of its sub-muscles (deduped by remedy id) so callers
+ * get concrete remedies instead of an empty list. Direct sub-muscle IDs are
+ * unaffected — they simply have no entry in SUB_MUSCLES and fall through
+ * with whatever direct matches (possibly none) they already had.
+ * @param {string} muscleBaseId
+ * @param {'tight'|'weak'|'normal'} [forState] — omit to match any state
+ * @returns {Remedy[]}
+ */
+function collectRemedies(muscleBaseId, forState) {
+  const matchesState = (r) => forState === undefined || r.forState === forState;
+
+  const direct = REMEDIES.filter((r) => r.muscleBaseId === muscleBaseId && matchesState(r));
+  if (direct.length > 0) return direct;
+
+  const subs = SUB_MUSCLES[muscleBaseId];
+  if (!subs) return direct;
+
+  const subIds = new Set(subs.map((s) => s.id));
+  const seen = new Set();
+  const unioned = [];
+  for (const remedy of REMEDIES) {
+    if (subIds.has(remedy.muscleBaseId) && matchesState(remedy) && !seen.has(remedy.id)) {
+      seen.add(remedy.id);
+      unioned.push(remedy);
+    }
+  }
+  return unioned;
+}
+
+/**
  * Get remedies for a given muscle base ID and state.
  * @param {string} muscleBaseId
  * @param {'tight'|'weak'|'normal'} forState
  */
 export function getRemedies(muscleBaseId, forState) {
-  return REMEDIES.filter(
-    (r) => r.muscleBaseId === muscleBaseId && r.forState === forState,
-  );
+  return collectRemedies(muscleBaseId, forState);
 }
 
 /**
  * Get all remedies for a muscle regardless of state.
  */
 export function getAllRemediesForMuscle(muscleBaseId) {
-  return REMEDIES.filter((r) => r.muscleBaseId === muscleBaseId);
+  return collectRemedies(muscleBaseId, undefined);
 }

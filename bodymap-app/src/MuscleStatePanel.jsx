@@ -1,4 +1,4 @@
-import { fromMuscleId, getMuscleLabel } from "./muscle-data";
+import { fromMuscleId } from "./muscle-data";
 
 const STATES = [
   { value: "tight", label: "Tight", color: "bg-rose-500/20 text-rose-300 border-rose-600/50", activeColor: "bg-rose-500/30 border-rose-500 text-rose-200" },

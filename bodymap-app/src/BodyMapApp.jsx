@@ -6,12 +6,6 @@ import {
   HeartPulse,
   Settings as SettingsIcon,
 } from "lucide-react";
-import MuscleAtlas from "./MuscleAtlas";
-import MuscleMechanicsPanel from "./MuscleMechanicsPanel";
-import RelationshipEdgesPanel from "./RelationshipEdgesPanel";
-import MuscleStatePanel from "./MuscleStatePanel";
-import RemedyPanel from "./RemedyPanel";
-import MovementRecruitmentPanel from "./MovementRecruitmentPanel";
 import SessionPlanner from "./SessionPlanner";
 import TodayScreen from "./TodayScreen";
 import BodyScreen from "./BodyScreen";
@@ -25,7 +19,7 @@ import MilestoneToast from "./MilestoneToast";
 import { recordActivity } from "./lib/recordActivity";
 import { checkMilestones } from "./lib/checkMilestones";
 import { useBodyBalanceScore } from "./lib/useBodyBalanceScore";
-import { MUSCLES, getMuscle, getMuscleLabel, migrateLegacyId, fromMuscleId, getBodySlug, SUB_MUSCLES } from "./muscle-data";
+import { getMuscleLabel, migrateLegacyId, fromMuscleId, getBodySlug } from "./muscle-data";
 
 const TrendCharts = lazy(() => import("./TrendCharts.jsx"));
 
@@ -259,7 +253,11 @@ function normalizeDailySnapshots(value) {
 //  3. Apply `migrateLegacyId()` to every muscleId that lands in v3 logs.
 //  4. Preserve every existing field (entries, assessments, muscleStates,
 //     onboarding, streak, milestones) untouched.
-function migrateBlobToV3(parsed) {
+// Exported solely for unit testing (see BodyMapApp.migrate.test.js);
+// splitting the persistence helpers into their own module is tracked as a
+// later phase.
+// eslint-disable-next-line react-refresh/only-export-components
+export function migrateBlobToV3(parsed) {
   if (!parsed || typeof parsed !== "object") return parsed;
   const incomingVersion = Number.isFinite(parsed.schemaVersion) ? parsed.schemaVersion : 1;
 
@@ -307,83 +305,6 @@ function migrateBlobToV3(parsed) {
   };
 }
 
-const MOVEMENT_GROUPS = {
-  squat: [
-    "Bodyweight Squat",
-    "Goblet Squat",
-    "Back Squat",
-    "Front Squat",
-    "Split Squat",
-    "Bulgarian Split Squat",
-    "Step-up",
-    "Pistol Squat (assisted)",
-  ],
-  hinge: [
-    "Deadlift",
-    "Romanian Deadlift",
-    "Single-leg RDL",
-    "Good Morning",
-    "Hip Thrust",
-    "Kettlebell Swing",
-    "Cable Pull-through",
-  ],
-  push: [
-    "Bench Press",
-    "Incline Press",
-    "Overhead Press",
-    "Push-up",
-    "Dips",
-    "Landmine Press",
-  ],
-  pull: ["Row", "Chest-supported Row", "Cable Row", "Lat Pulldown", "Pull-up", "Face Pull"],
-  rotation: ["Thoracic Rotation", "Wood Chop", "Cable Rotation", "Pallof Press", "Open Book"],
-  daily: [
-    "Walking",
-    "Sitting",
-    "Standing Up",
-    "Reaching Overhead",
-    "Bending to Pick Something Up",
-    "Carrying Load",
-    "Climbing Stairs",
-  ],
-  assessment: [
-    "Overhead Squat Test",
-    "Thomas Test",
-    "Wall Angel",
-    "Single-leg Balance",
-    "Hip Internal Rotation",
-    "Ankle Dorsiflexion Knee-to-wall",
-  ],
-};
-
-const SENSATION_TYPES = [
-  "tight",
-  "sharp pain",
-  "dull ache",
-  "pinching",
-  "clicking/popping",
-  "weakness",
-  "numbness/tingling",
-  "nothing/fine",
-  "restricted range",
-];
-
-const SENSATION_COLORS = {
-  tight: "#facc15",
-  "sharp pain": "#ef4444",
-  "dull ache": "#fb7185",
-  pinching: "#f97316",
-  "clicking/popping": "#eab308",
-  weakness: "#60a5fa",
-  "numbness/tingling": "#a78bfa",
-  "nothing/fine": "#34d399",
-  "restricted range": "#f59e0b",
-};
-
-const WHEN_OPTIONS = ["during movement", "after movement", "at rest", "in the morning", "end of work day"];
-const PHASE_OPTIONS = ["before movement", "during movement", "after movement"];
-const CONTEXT_CHIPS = ["post-leg-day", "desk-heavy day", "poor sleep", "high stress"];
-
 const ASSESSMENT_TESTS = [
   { name: "Overhead Squat", unit: "score" },
   { name: "Thomas Test", unit: "deg" },
@@ -396,56 +317,6 @@ const ASSESSMENT_TESTS = [
   { name: "Side Plank Endurance", unit: "sec" },
   { name: "Single-leg Sit-to-stand", unit: "reps" },
 ];
-
-const MOVEMENT_BIOMECH_HINTS = {
-  squat: {
-    primeRegions: ["abs-l", "abs-r", "gluteal-l", "gluteal-r",
-      "quadriceps-l", "quadriceps-r"],
-    note: "Primary demand: trunk stiffness + coordinated knee/hip flexion and extension.",
-  },
-  hinge: {
-    primeRegions: ["gluteal-l", "gluteal-r", "hamstring-l", "hamstring-r",
-      "lower-back-l", "lower-back-r"],
-    note: "Primary demand: posterior chain force with spinal bracing and hip displacement.",
-  },
-  push: {
-    primeRegions: ["chest-l", "chest-r", "deltoids-l", "deltoids-r",
-      "triceps-l", "triceps-r"],
-    note: "Primary demand: shoulder girdle control and force transfer through trunk.",
-  },
-  pull: {
-    primeRegions: ["upper-back-l", "upper-back-r", "trapezius-l", "trapezius-r",
-      "biceps-l", "biceps-r"],
-    note: "Primary demand: scapular control, shoulder extension/adduction, trunk stability.",
-  },
-  rotation: {
-    primeRegions: ["obliques-l", "obliques-r", "abs-l", "abs-r",
-      "lower-back-l", "lower-back-r"],
-    note: "Primary demand: rotational power + anti-rotation control across trunk and hips.",
-  },
-  daily: {
-    primeRegions: ["abs-l", "abs-r", "quadriceps-l", "quadriceps-r",
-      "gluteal-l", "gluteal-r"],
-    note: "Primary demand: low-level stabilization and repeatable gait/posture mechanics.",
-  },
-  assessment: {
-    primeRegions: ["abs-l", "abs-r", "gluteal-l", "gluteal-r",
-      "ankles-l", "ankles-r"],
-    note: "Primary demand: movement quality, control, and asymmetry detection.",
-  },
-};
-
-const EMPTY_FORM = {
-  originRegion: "",
-  sensationRegion: "",
-  movement: "",
-  sensationType: "tight",
-  intensity: 4,
-  whenLabel: "during movement",
-  phase: "during movement",
-  notes: "",
-  context: [],
-};
 
 function safeParse(value, fallback) {
   try {
@@ -464,13 +335,6 @@ function confidenceLabel(count) {
   if (count >= 5) return "medium";
   if (count >= 3) return "low";
   return "none";
-}
-
-function confidenceClass(conf) {
-  if (conf === "high") return "bg-emerald-500/20 text-emerald-200 border-emerald-400/50";
-  if (conf === "medium") return "bg-amber-500/20 text-amber-200 border-amber-400/50";
-  if (conf === "low") return "bg-sky-500/20 text-sky-200 border-sky-400/50";
-  return "bg-zinc-700 text-zinc-200 border-zinc-500";
 }
 
 function sideOf(regionId) {
@@ -494,15 +358,10 @@ export default function BodyMapApp() {
   const [tab, setTab] = useState("today");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [view, setView] = useState("front");
-  const [pickMode, setPickMode] = useState("origin");
   const [entries, setEntries] = useState([]);
   const [assessments, setAssessments] = useState([]);
   const [muscleStates, setMuscleStates] = useState({});
-  const [recruitmentTint, setRecruitmentTint] = useState(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [movementSearch, setMovementSearch] = useState("");
   const [assessmentSearch, setAssessmentSearch] = useState("");
-  const [form, setForm] = useState(EMPTY_FORM);
   const [filter, setFilter] = useState({ sensationType: "all", minIntensity: 0, side: "all" });
   const [assessmentForm, setAssessmentForm] = useState({
     test: ASSESSMENT_TESTS[0].name,
@@ -555,7 +414,7 @@ export default function BodyMapApp() {
     const storage = window.storage || window.localStorage;
     const maybe = storage?.getItem?.(STORAGE_KEY);
     if (!maybe) {
-      setLoaded(true);
+      hydrateFromParsed({});
       return;
     }
     if (typeof maybe.then === "function") {
@@ -603,47 +462,6 @@ export default function BodyMapApp() {
     dailySnapshots,
   ]);
 
-  const movementOptions = useMemo(() => {
-    const muscle = getMuscle(form.originRegion);
-    const keys = muscle?.movementGroups?.length ? muscle.movementGroups : Object.keys(MOVEMENT_GROUPS);
-    const expanded = keys.flatMap((k) => MOVEMENT_GROUPS[k] || []);
-    const unique = [...new Set(expanded)];
-    if (!movementSearch.trim()) return unique;
-    const q = movementSearch.trim().toLowerCase();
-    return unique.filter((m) => m.toLowerCase().includes(q));
-  }, [form.originRegion, movementSearch]);
-
-  const bodyIntel = useMemo(() => {
-    const muscle = getMuscle(form.originRegion);
-    if (!muscle) return null;
-
-    const movementGroup =
-      Object.entries(MOVEMENT_GROUPS).find(([, names]) => names.includes(form.movement))?.[0] ||
-      muscle.movementGroups?.[0] ||
-      "daily";
-
-    const movementIntel = MOVEMENT_BIOMECH_HINTS[movementGroup] || MOVEMENT_BIOMECH_HINTS.daily;
-    const topCompensators = (muscle.commonCompensators || [])
-      .slice(0, 4)
-      .map((id) => ({ id, label: toLabel(id) }));
-
-    const mismatchRisk =
-      form.sensationRegion &&
-      form.sensationRegion !== form.originRegion &&
-      !movementIntel.primeRegions.includes(form.sensationRegion);
-
-    return {
-      regionLabel: muscle.label,
-      movementGroup,
-      movementNote: movementIntel.note,
-      primaryActions: muscle.primaryActions || [],
-      primeRegions: movementIntel.primeRegions || [],
-      topCompensators,
-      mismatchRisk,
-      clinicalNotes: muscle.clinicalNotes,
-    };
-  }, [form.originRegion, form.movement, form.sensationRegion]);
-
   const assessmentOptions = useMemo(() => {
     if (!assessmentSearch.trim()) return ASSESSMENT_TESTS;
     const q = assessmentSearch.toLowerCase();
@@ -665,20 +483,6 @@ export default function BodyMapApp() {
       return true;
     });
   }, [entries, filter]);
-
-  const commonPairs = useMemo(() => {
-    if (!form.originRegion) return [];
-    const counts = {};
-    entries
-      .filter((e) => e.originRegion === form.originRegion)
-      .forEach((e) => {
-        counts[e.sensationRegion] = (counts[e.sensationRegion] || 0) + 1;
-      });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([regionId, count]) => ({ regionId, count, label: toLabel(regionId) }));
-  }, [entries, form.originRegion]);
 
   const chains = useMemo(() => {
     const map = new Map();
@@ -702,7 +506,7 @@ export default function BodyMapApp() {
       chain.timestamps.push(new Date(entry.timestamp).getTime());
     });
 
-    const now = Date.now();
+    const now = new Date().getTime();
     const WEEK = 7 * 24 * 60 * 60 * 1000;
     return [...map.values()]
       .map((chain) => {
@@ -734,17 +538,6 @@ export default function BodyMapApp() {
       scores[entry.sensationRegion] = (scores[entry.sensationRegion] || 0) + (Number(entry.intensity) || 0);
     });
     return scores;
-  }, [filteredEntries]);
-
-  const timelineData = useMemo(() => {
-    return filteredEntries
-      .slice()
-      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-      .slice(-40)
-      .map((entry) => ({
-        date: new Date(entry.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-        intensity: Number(entry.intensity) || 0,
-      }));
   }, [filteredEntries]);
 
   const assessmentTrendData = useMemo(() => {
@@ -916,15 +709,6 @@ export default function BodyMapApp() {
     recordMeaningfulAction({ muscleStates: nextStates });
   };
 
-  const saveEntry = () => {
-    if (!form.originRegion || !form.sensationRegion || !form.movement) return;
-    const newEntry = { id: crypto.randomUUID(), ...form, timestamp: new Date().toISOString() };
-    const nextEntries = [...entries, newEntry];
-    setEntries(nextEntries);
-    setForm((prev) => ({ ...prev, notes: "", intensity: Math.max(2, prev.intensity - 1) }));
-    recordMeaningfulAction({ entries: nextEntries });
-  };
-
   // Stage 02-A.5 / U4 — Slide-out Log sub-tab calls this with a partial entry
   // already pre-filled to the selected muscle. U8 widened the contract so the
   // remedy-adherence event ({ kind: "adherence", muscleId, remedyId, timestamp })
@@ -1024,23 +808,6 @@ export default function BodyMapApp() {
     setAssessmentForm((prev) => ({ ...prev, leftValue: "", rightValue: "" }));
     recordMeaningfulAction({ assessments: nextAssessments });
   };
-
-  const loadLastEntry = () => {
-    if (!entries.length) return;
-    const last = entries[entries.length - 1];
-    setForm((prev) => ({ ...prev, ...last, notes: "" }));
-    const muscle = getMuscle(last.originRegion);
-    setView(muscle?.primaryView || "front");
-    setPickMode("origin");
-  };
-
-  const muscleDropdownGroups = useMemo(() => {
-    return MUSCLES.filter((m) => m.side === 'left').map((m) => ({
-      slug: m.slug,
-      groupLabel: m.label.replace(/ \(L\)$/, ''),
-      subs: SUB_MUSCLES[m.slug] || null,
-    }));
-  }, []);
 
   const exportData = () => {
     // Stage 02-B / F5 — export mirrors the persisted v3 shape exactly,
@@ -1235,15 +1002,6 @@ export default function BodyMapApp() {
     });
   };
 
-  const selectByMap = (muscleId) => {
-    if (pickMode === "origin") {
-      setForm((prev) => ({ ...prev, originRegion: muscleId }));
-      setPickMode("sensation");
-      return;
-    }
-    setForm((prev) => ({ ...prev, sensationRegion: muscleId }));
-  };
-
   // U2: four-tab IA — Today / Body / Plan / Progress.
   const NAV_TABS = [
     { id: "today", label: "Today", Icon: HeartPulse },
@@ -1275,6 +1033,20 @@ export default function BodyMapApp() {
     stateChanges,
     adherence,
   });
+
+  // Phase 1 / P1-a — week-over-week trend for the Today hero. Reruns the
+  // same pure composite as of 7 days ago (same logs, shifted clock) so the
+  // trend reflects real M3/M4/M6/M7 movement instead of a hard-coded null.
+  const bbsWeekAgo = useBodyBalanceScore({
+    entries,
+    assessments,
+    muscleStates,
+    stateChanges,
+    adherence,
+    now: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+  });
+  const bbsTrend =
+    bbs.isCalibrating || bbsWeekAgo.isCalibrating ? null : bbs.score - bbsWeekAgo.score;
 
   const streakChip = <StreakBadge streak={streak} />;
 
@@ -1354,319 +1126,6 @@ export default function BodyMapApp() {
           />
         )}
 
-        {tab === "body-legacy-disabled" && (
-          <div>
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_420px]">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-zinc-300">Muscle Atlas</span>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    className={`rounded px-2 py-1 text-xs ${view === "front" ? "bg-teal-600 text-teal-50" : "bg-zinc-800 text-zinc-300"}`}
-                    onClick={() => setView("front")}
-                  >
-                    Front
-                  </button>
-                  <button
-                    className={`rounded px-2 py-1 text-xs ${view === "back" ? "bg-teal-600 text-teal-50" : "bg-zinc-800 text-zinc-300"}`}
-                    onClick={() => setView("back")}
-                  >
-                    Back
-                  </button>
-                </div>
-              </div>
-
-              <MuscleAtlas
-                view={view}
-                pickMode={pickMode}
-                onSelect={selectByMap}
-                origin={form.originRegion}
-                sensation={form.sensationRegion}
-                recruitmentTint={recruitmentTint}
-              />
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-200" onClick={() => setPickMode("origin")}>
-                  Select Origin
-                </button>
-                <button
-                  className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
-                  onClick={() => setPickMode("sensation")}
-                >
-                  Select Sensation
-                </button>
-                <button className="rounded-md bg-teal-700/60 px-3 py-2 text-sm text-teal-100" onClick={loadLastEntry}>
-                  Log Again
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-sm text-zinc-300">
-                Origin: <span className="text-zinc-100">{form.originRegion ? toLabel(form.originRegion) : "None selected"}</span>
-              </div>
-              <div className="text-sm text-zinc-300">
-                Sensation:{" "}
-                <span className="text-zinc-100">{form.sensationRegion ? toLabel(form.sensationRegion) : "None selected"}</span>
-              </div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs text-zinc-400">Origin selector</label>
-                  <select
-                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                    value={form.originRegion}
-                    onChange={(e) => setForm((prev) => ({ ...prev, originRegion: e.target.value }))}
-                  >
-                    <option value="">Select origin region...</option>
-                    {muscleDropdownGroups.map((g) => (
-                      <optgroup key={`origin-grp-${g.slug}`} label={g.groupLabel}>
-                        <option value={`${g.slug}-l`}>{g.groupLabel} (L) — whole group</option>
-                        <option value={`${g.slug}-r`}>{g.groupLabel} (R) — whole group</option>
-                        {g.subs && g.subs.map((sub) => (
-                          <option key={`origin-${sub.id}-l`} value={`${sub.id}-l`}>↳ {sub.label} (L)</option>
-                        ))}
-                        {g.subs && g.subs.map((sub) => (
-                          <option key={`origin-${sub.id}-r`} value={`${sub.id}-r`}>↳ {sub.label} (R)</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-zinc-400">Sensation selector</label>
-                  <select
-                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                    value={form.sensationRegion}
-                    onChange={(e) => setForm((prev) => ({ ...prev, sensationRegion: e.target.value }))}
-                  >
-                    <option value="">Select sensation region...</option>
-                    {muscleDropdownGroups.map((g) => (
-                      <optgroup key={`sensation-grp-${g.slug}`} label={g.groupLabel}>
-                        <option value={`${g.slug}-l`}>{g.groupLabel} (L) — whole group</option>
-                        <option value={`${g.slug}-r`}>{g.groupLabel} (R) — whole group</option>
-                        {g.subs && g.subs.map((sub) => (
-                          <option key={`sensation-${sub.id}-l`} value={`${sub.id}-l`}>↳ {sub.label} (L)</option>
-                        ))}
-                        {g.subs && g.subs.map((sub) => (
-                          <option key={`sensation-${sub.id}-r`} value={`${sub.id}-r`}>↳ {sub.label} (R)</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {commonPairs.length > 0 && (
-                <div>
-                  <label className="mb-1 block text-xs text-zinc-400">Common pair suggestions</label>
-                  <div className="flex flex-wrap gap-2">
-                    {commonPairs.map((pair) => (
-                      <button
-                        key={pair.regionId}
-                        onClick={() => setForm((prev) => ({ ...prev, sensationRegion: pair.regionId }))}
-                        className="rounded-md border border-zinc-600 bg-zinc-800 px-2 py-1.5 text-xs text-zinc-200"
-                      >
-                        {pair.label} ({pair.count})
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {bodyIntel && (
-                <>
-                  <div className="rounded-lg border border-zinc-700 bg-zinc-900/80 p-3">
-                    <div className="text-xs font-medium uppercase tracking-wide text-teal-300">Body Intelligence</div>
-                    <div className="mt-1 text-sm text-zinc-200">
-                      Muscle focus: <span className="font-medium">{bodyIntel.regionLabel}</span> ({bodyIntel.movementGroup})
-                    </div>
-                    <div className="mt-1 text-xs text-zinc-400">{bodyIntel.movementNote}</div>
-
-                    <div className="mt-2">
-                      <div className="text-xs text-zinc-400">Primary actions</div>
-                      <ul className="mt-1 space-y-1 text-xs text-zinc-300">
-                        {bodyIntel.primaryActions.slice(0, 3).map((action) => (
-                          <li key={action}>• {action}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {bodyIntel.topCompensators.length > 0 && (
-                      <div className="mt-2">
-                        <div className="text-xs text-zinc-400">Likely compensators if overloaded</div>
-                        <div className="mt-1 flex flex-wrap gap-1.5">
-                          {bodyIntel.topCompensators.map((comp) => (
-                            <span key={comp.id} className="rounded bg-zinc-800 px-2 py-1 text-xs text-zinc-300">
-                              {comp.label}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {bodyIntel.clinicalNotes && (
-                      <div className="mt-2 text-xs text-zinc-500 italic">{bodyIntel.clinicalNotes}</div>
-                    )}
-
-                    {bodyIntel.mismatchRisk && (
-                      <div className="mt-2 rounded border border-rose-400/40 bg-rose-500/10 px-2 py-1.5 text-xs text-rose-200">
-                        Selected sensation site is outside the main prime movers for this pattern, which can indicate compensation or referral.
-                      </div>
-                    )}
-                  </div>
-                  <MuscleMechanicsPanel muscleId={form.originRegion} />
-                  <RelationshipEdgesPanel muscleId={form.originRegion} />
-                  <MuscleStatePanel muscleId={form.originRegion} muscleStates={muscleStates} onSetState={handleSetMuscleState} />
-                  <RemedyPanel muscleId={form.originRegion} muscleStates={muscleStates} />
-                </>
-              )}
-              <MovementRecruitmentPanel onRecruitmentChange={setRecruitmentTint} />
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Search movement</label>
-                <input
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                  placeholder="e.g. squat, deadlift, rotation..."
-                  value={movementSearch}
-                  onChange={(e) => setMovementSearch(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Movement pattern</label>
-                <select
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                  value={form.movement}
-                  onChange={(e) => setForm((prev) => ({ ...prev, movement: e.target.value }))}
-                >
-                  <option value="">Select movement...</option>
-                  {movementOptions.map((movement) => (
-                    <option key={movement} value={movement}>
-                      {movement}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-xs text-zinc-400">Sensation</label>
-                  <select
-                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                    value={form.sensationType}
-                    onChange={(e) => setForm((prev) => ({ ...prev, sensationType: e.target.value }))}
-                  >
-                    {SENSATION_TYPES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-zinc-400">When</label>
-                  <select
-                    className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                    value={form.whenLabel}
-                    onChange={(e) => setForm((prev) => ({ ...prev, whenLabel: e.target.value }))}
-                  >
-                    {WHEN_OPTIONS.map((w) => (
-                      <option key={w} value={w}>
-                        {w}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Before / During / After movement</label>
-                <select
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                  value={form.phase}
-                  onChange={(e) => setForm((prev) => ({ ...prev, phase: e.target.value }))}
-                >
-                  {PHASE_OPTIONS.map((phase) => (
-                    <option key={phase} value={phase}>
-                      {phase}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Intensity: {form.intensity}</label>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={form.intensity}
-                  className="h-7 w-full"
-                  onChange={(e) => setForm((prev) => ({ ...prev, intensity: Number(e.target.value) }))}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Context</label>
-                <div className="flex flex-wrap gap-2">
-                  {CONTEXT_CHIPS.map((chip) => {
-                    const active = form.context.includes(chip);
-                    return (
-                      <button
-                        key={chip}
-                        type="button"
-                        className={`rounded-full border px-3 py-1.5 text-xs ${
-                          active
-                            ? "border-teal-400/50 bg-teal-500/20 text-teal-100"
-                            : "border-zinc-600 bg-zinc-800 text-zinc-300"
-                        }`}
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            context: active ? prev.context.filter((c) => c !== chip) : [...prev.context, chip],
-                          }))
-                        }
-                      >
-                        {chip}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs text-zinc-400">Notes</label>
-                <textarea
-                  rows={3}
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-                  value={form.notes}
-                  onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
-                />
-              </div>
-
-              <div className="hidden flex-wrap gap-2 sm:flex">
-                <button className="rounded-md bg-teal-600 px-3 py-2 text-sm font-medium text-teal-50" onClick={saveEntry}>
-                  Save Entry
-                </button>
-                <button className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-200" onClick={() => setForm(EMPTY_FORM)}>
-                  Clear
-                </button>
-                <button className="rounded-md bg-zinc-700 px-3 py-2 text-sm text-zinc-200" onClick={exportData}>
-                  Export JSON
-                </button>
-                <button className="rounded-md bg-zinc-700 px-3 py-2 text-sm text-zinc-200" onClick={exportClinicalReport}>
-                  Export Clinical Report
-                </button>
-                <label className="cursor-pointer rounded-md bg-zinc-700 px-3 py-2 text-sm text-zinc-200">
-                  Import JSON
-                  <input type="file" accept="application/json" className="hidden" onChange={importData} />
-                </label>
-              </div>
-            </div>
-          </div>
-          </div>
-        )}
-
         {tab === "progress" && (
           <ProgressScreen
             entries={entries}
@@ -1680,7 +1139,6 @@ export default function BodyMapApp() {
             symmetrySummary={symmetrySummary}
             weightedHeatScores={weightedHeatScores}
             filteredEntries={filteredEntries}
-            timelineData={timelineData}
             assessmentTrendData={assessmentTrendData}
             filter={filter}
             onFilterChange={setFilter}
@@ -1806,6 +1264,9 @@ export default function BodyMapApp() {
           <TodayScreen
             entries={entries}
             muscleStates={muscleStates}
+            stateChanges={stateChanges}
+            bbs={bbs}
+            bbsTrend={bbsTrend}
             onOpenBody={() => setTab("body")}
             onOpenPlan={() => setTab("plan")}
             onOpenProgress={() => setTab("progress")}

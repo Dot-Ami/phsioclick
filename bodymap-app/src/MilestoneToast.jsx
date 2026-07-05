@@ -26,23 +26,43 @@ import {
   X,
 } from "lucide-react";
 
-const ICONS = {
-  target: Target,
-  "check-circle-2": CheckCircle2,
-  ruler: Ruler,
-  flag: Flag,
-  trophy: Trophy,
-  flame: Flame,
-  compass: Compass,
-  map: MapIcon,
-  gauge: Gauge,
-  sparkles: Sparkles,
-  award: Award,
-  "trending-up": TrendingUp,
-};
-
 const TOAST_MS = 4000;
 const HAPTIC_MS = 200;
+
+// Renders the icon element directly (rather than selecting a component
+// reference into a variable) so the icon choice stays a plain per-branch
+// JSX literal — safe under the React Compiler's "no components created
+// during render" check, unlike a dynamic `ICONS[key]` lookup rendered as
+// `<Icon />`.
+function renderMilestoneIcon(iconKey) {
+  switch (iconKey) {
+    case "target":
+      return <Target size={20} aria-hidden="true" />;
+    case "check-circle-2":
+      return <CheckCircle2 size={20} aria-hidden="true" />;
+    case "ruler":
+      return <Ruler size={20} aria-hidden="true" />;
+    case "flag":
+      return <Flag size={20} aria-hidden="true" />;
+    case "trophy":
+      return <Trophy size={20} aria-hidden="true" />;
+    case "flame":
+      return <Flame size={20} aria-hidden="true" />;
+    case "compass":
+      return <Compass size={20} aria-hidden="true" />;
+    case "map":
+      return <MapIcon size={20} aria-hidden="true" />;
+    case "gauge":
+      return <Gauge size={20} aria-hidden="true" />;
+    case "award":
+      return <Award size={20} aria-hidden="true" />;
+    case "trending-up":
+      return <TrendingUp size={20} aria-hidden="true" />;
+    case "sparkles":
+    default:
+      return <Sparkles size={20} aria-hidden="true" />;
+  }
+}
 
 export default function MilestoneToast({ queue = [], catalog = [], onDismiss }) {
   const head = queue[0] || null;
@@ -72,8 +92,6 @@ export default function MilestoneToast({ queue = [], catalog = [], onDismiss }) 
 
   if (!head) return null;
 
-  const Icon = (meta && ICONS[meta.icon]) || Sparkles;
-
   return (
     <div
       className="fixed inset-x-0 bottom-20 z-50 flex justify-center px-3 sm:bottom-auto sm:right-6 sm:top-20 sm:justify-end sm:px-0"
@@ -87,7 +105,7 @@ export default function MilestoneToast({ queue = [], catalog = [], onDismiss }) 
       >
         <div className="flex items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand">
-            <Icon size={20} aria-hidden="true" />
+            {renderMilestoneIcon(meta?.icon)}
           </span>
           <div className="flex-1">
             <p className="text-body-lg font-semibold text-zinc-100">
