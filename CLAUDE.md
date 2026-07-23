@@ -5,9 +5,13 @@
 
 ---
 
-## You are working on: Dot Body Map
+## You are working on: Dot Health Hub
 
-A React + Vite + Tailwind web app built around a high-resolution anatomical atlas.
+*(Renamed from **Dot Body Map** 2026-07-23; the body map remains the flagship feature. Storage key `dot-body-map-v3` and all muscle IDs are unchanged.)*
+
+A React + Vite + Tailwind web app built around a high-resolution anatomical atlas, expanding toward whole-health tracking (nutrition, biomarkers — see `docs/handoff/2026-07-23-health-hub-recap-and-proposal.md`).
+
+**Live app:** https://dot-ami.github.io/phsioclick/ (auto-deploys from `main` via `.github/workflows/deploy.yml`)
 
 **Primary purpose:** personal training and body balance — workout planning, tight/weak awareness, and identifying what to fix next. **Not** a medical diagnostic tool; all outputs are educational / decision-support with an explicit footer disclaimer.
 

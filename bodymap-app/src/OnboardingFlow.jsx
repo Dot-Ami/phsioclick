@@ -262,7 +262,7 @@ function Step1Welcome({ onNext, onSkip }) {
         className="mx-auto text-brand"
         strokeWidth={1.5}
       />
-      <h2 className="text-h1 text-zinc-100">Welcome to Dot Body Map.</h2>
+      <h2 className="text-h1 text-zinc-100">Welcome to Dot Health Hub.</h2>
       <p className="text-body-lg text-zinc-300">
         This is a personal training tool for understanding how your body feels
         and how you&apos;re trending over time.

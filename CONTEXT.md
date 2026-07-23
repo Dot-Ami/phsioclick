@@ -6,7 +6,7 @@
 
 ## Project at a glance
 
-**Dot Body Map** — interactive anatomical atlas for workout planning, tight/weak awareness, and body balance. React + Vite + Tailwind, localStorage persistence (`dot-body-map-v3`, schema v3 as of Stage 02-B / F1).
+**Dot Health Hub** (formerly Dot Body Map, renamed 2026-07-23) — interactive anatomical atlas for workout planning, tight/weak awareness, and body balance, expanding toward whole-health tracking. React + Vite + Tailwind, localStorage persistence (`dot-body-map-v3`, schema v3 as of Stage 02-B / F1 — key name intentionally unchanged by the rename).
 
 **Body intelligence is a 6-layer stack** (L0 mechanics → L1 edges → L2 state → L3 remedies → L4 movements → L5 planner). All layers are live in v1.
 

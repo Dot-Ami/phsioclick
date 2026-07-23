@@ -842,7 +842,7 @@ export default function BodyMapApp() {
     const highIntensityCount = entries.filter((e) => Number(e.intensity) >= 8).length;
 
     const markdown = [
-      "# Dot Body Map Clinical Snapshot",
+      "# Dot Health Hub Clinical Snapshot",
       "",
       `Generated: ${dateLabel}`,
       "",
@@ -1071,7 +1071,7 @@ export default function BodyMapApp() {
         <header className="mb-4 rounded-14 border border-zinc-800 bg-zinc-900/80">
           <div className="flex items-center justify-between gap-3 px-4 pt-4">
             <div>
-              <h1 className="text-xl font-semibold sm:text-2xl">Dot Body Map</h1>
+              <h1 className="text-xl font-semibold sm:text-2xl">Dot Health Hub</h1>
               <p className="mt-1 text-caption text-zinc-400 sm:text-sm">
                 Personal training &amp; body balance — educational, not medical.
               </p>
@@ -1275,7 +1275,7 @@ export default function BodyMapApp() {
 
         <footer className="mt-8 rounded-lg border border-zinc-800/60 bg-zinc-900/40 px-4 py-3 text-center text-[11px] leading-relaxed text-zinc-600">
           <strong className="text-zinc-500">Decision-support / educational tool only.</strong>{" "}
-          Dot Body Map is not a medical device and does not provide clinical diagnosis, treatment prescriptions,
+          Dot Health Hub is not a medical device and does not provide clinical diagnosis, treatment prescriptions,
           or replace in-person assessment by a qualified practitioner.
           Suggestions are generated from structured rules and user-entered data — always seek professional care for injuries or persistent pain.
         </footer>
